@@ -4,6 +4,7 @@ import com.biblioteca.sismer.infrastructure.database.DatabaseCredentials;
 import com.biblioteca.sismer.model.Livro;
 import org.springframework.stereotype.Repository;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -148,5 +149,30 @@ public class LivroRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean verifyDependency(Long id){
+        String query = """
+                SELECT e.id, u.id FROM emprestimo e
+                JOIN usuario u
+                ON u.id = e.usuario_id
+                WHERE u.id = ?
+                """;
+        try(Connection conn = DatabaseCredentials.connectar();
+        PreparedStatement stmt = conn.prepareStatement(query)){
+
+            stmt.setLong(1, id);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()){
+                return rs.getInt(1) > 0;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return false;
     }
 }

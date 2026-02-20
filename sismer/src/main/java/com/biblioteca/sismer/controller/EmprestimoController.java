@@ -1,5 +1,6 @@
 package com.biblioteca.sismer.controller;
 
+import com.biblioteca.sismer.dto.DevolucaoDTO;
 import com.biblioteca.sismer.model.Emprestimo;
 import com.biblioteca.sismer.service.EmprestimoService;
 import org.apache.coyote.Request;
@@ -18,8 +19,6 @@ public class EmprestimoController {
     public EmprestimoController(EmprestimoService emprestimoService){
         this.emprestimoService = emprestimoService;
     }
-
-
 
     @PostMapping
     public Emprestimo registrarEmprestimo(@RequestBody Emprestimo emprestimo){
@@ -69,13 +68,21 @@ public class EmprestimoController {
     }
 
     @PutMapping("{id}/devolucao")
-    public Emprestimo registrarDevolucao(@PathVariable Long id, @RequestBody Date dataDevolucao){
+    public Emprestimo registrarDevolucao(@PathVariable Long id, @RequestBody DevolucaoDTO dto){
         try{
-            return emprestimoService.registrarDevolucao(id, dataDevolucao);
+            return emprestimoService.registrarDevolucao(id, dto);
         }catch (SQLException e){
             throw new RuntimeException(e.getMessage());
         }
 
+    }
+    @GetMapping("usuario/{id}")
+    public List<Emprestimo> emprestimosUsuario(@PathVariable Long id){
+        try{
+            return emprestimoService.emprestimosUsuario(id);
+        } catch (SQLException e){
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
 }

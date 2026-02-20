@@ -3,7 +3,6 @@ package com.biblioteca.sismer.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.sql.Date;
-import java.time.LocalDate;
 
 public class Emprestimo {
 
@@ -12,12 +11,11 @@ public class Emprestimo {
     private Usuario usuario;
     private Date dataEmprestimo;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate dataDevolucao;
+    private Date dataDevolucao;
 
     public Emprestimo() {}
 
-    public Emprestimo(Long id, Livro livro, Usuario usuario, Date dataEmprestimo, LocalDate dataDevolucao) {
+    public Emprestimo(Long id, Livro livro, Usuario usuario, Date dataEmprestimo, Date dataDevolucao) {
         this.id = id;
         this.livro = livro;
         this.usuario = usuario;
@@ -27,12 +25,14 @@ public class Emprestimo {
 
     public Emprestimo(Long id, Livro livro, Usuario usuario, Date dataEmprestimo) {
         this.id = id;
-        this.livro = livro;
-        this.usuario = usuario;
+        this.livro = null;
+        this.usuario = null;
         this.dataEmprestimo = dataEmprestimo;
     }
 
-    public Emprestimo(Long id, LocalDate dataDevolucao) {
+
+
+    public Emprestimo(Long id, Date dataDevolucao) {
         this.id = id;
         this.dataDevolucao = dataDevolucao;
     }
@@ -49,6 +49,6 @@ public class Emprestimo {
     public Date getDataEmprestimo() { return dataEmprestimo; }
     public void setDataEmprestimo(Date dataEmprestimo) { this.dataEmprestimo = dataEmprestimo; }
 
-    public LocalDate getDataDevolucao() { return dataDevolucao; }
-    public void setDataDevolucao(LocalDate dataDevolucao) { this.dataDevolucao = dataDevolucao; }
+    public Date getDataDevolucao() { return dataDevolucao; }
+    public void setDataDevolucao(Date dataDevolucao) { this.dataDevolucao = dataDevolucao; }
 }

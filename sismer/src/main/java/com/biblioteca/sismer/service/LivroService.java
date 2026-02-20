@@ -43,6 +43,11 @@ public class LivroService {
             throw new RuntimeException();
         }
 
+        if(livroRepository.verifyDependency(id)){
+            throw new RuntimeException("Existe um Usuário com este livro!!!");
+        }
+
         livroRepository.deletar(id);
     }
+
 }

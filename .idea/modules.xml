@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/sismer.iml" filepath="$PROJECT_DIR$/.idea/sismer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sismer/sismer.iml" filepath="$PROJECT_DIR$/sismer/sismer.iml" />
     </modules>
   </component>
 </project>

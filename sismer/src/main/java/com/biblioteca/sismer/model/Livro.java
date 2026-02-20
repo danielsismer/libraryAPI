@@ -10,6 +10,10 @@ public class Livro {
     public Livro() {
     }
 
+    public Livro(Long id) {
+        this.id = id;
+    }
+
     public Livro(Long id, String titulo, String autor, int ano) {
         this.id = id;
         this.titulo = titulo;
