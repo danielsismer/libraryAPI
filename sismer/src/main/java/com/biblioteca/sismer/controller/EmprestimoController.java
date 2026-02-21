@@ -1,6 +1,8 @@
 package com.biblioteca.sismer.controller;
 
 import com.biblioteca.sismer.dto.DevolucaoDTO;
+import com.biblioteca.sismer.dto.request.EmprestimoRequestDTO;
+import com.biblioteca.sismer.dto.response.EmprestimoResponseDTO;
 import com.biblioteca.sismer.model.Emprestimo;
 import com.biblioteca.sismer.service.EmprestimoService;
 import org.apache.coyote.Request;
@@ -21,7 +23,7 @@ public class EmprestimoController {
     }
 
     @PostMapping
-    public Emprestimo registrarEmprestimo(@RequestBody Emprestimo emprestimo){
+    public EmprestimoResponseDTO registrarEmprestimo(@RequestBody EmprestimoRequestDTO emprestimo){
         try{
             return emprestimoService.registrarEmprestimo(emprestimo);
         } catch (SQLException e ){
@@ -30,7 +32,7 @@ public class EmprestimoController {
     }
 
     @GetMapping
-    public List<Emprestimo> listarTodos(){
+    public List<EmprestimoResponseDTO> listarTodos(){
         try{
             return emprestimoService.listarTodos();
         } catch (SQLException e ){
@@ -39,7 +41,7 @@ public class EmprestimoController {
     }
 
     @GetMapping("/{id}")
-    public Emprestimo buscarPorID(@PathVariable Long id){
+    public EmprestimoResponseDTO buscarPorID(@PathVariable Long id){
         try{
             return emprestimoService.buscarPorID(id);
         } catch (SQLException e){
@@ -48,7 +50,7 @@ public class EmprestimoController {
     }
 
     @PutMapping("/{id}")
-    public Emprestimo atualizar(@PathVariable Long id, @RequestBody Emprestimo emprestimo){
+    public EmprestimoResponseDTO atualizar(@PathVariable Long id, @RequestBody EmprestimoRequestDTO emprestimo){
         try{
             return emprestimoService.atualizar(id, emprestimo);
         } catch (SQLException e){
@@ -68,7 +70,7 @@ public class EmprestimoController {
     }
 
     @PutMapping("{id}/devolucao")
-    public Emprestimo registrarDevolucao(@PathVariable Long id, @RequestBody DevolucaoDTO dto){
+    public EmprestimoResponseDTO registrarDevolucao(@PathVariable Long id, @RequestBody DevolucaoDTO dto){
         try{
             return emprestimoService.registrarDevolucao(id, dto);
         }catch (SQLException e){
@@ -76,8 +78,9 @@ public class EmprestimoController {
         }
 
     }
+
     @GetMapping("usuario/{id}")
-    public List<Emprestimo> emprestimosUsuario(@PathVariable Long id){
+    public List<EmprestimoResponseDTO> emprestimosUsuario(@PathVariable Long id){
         try{
             return emprestimoService.emprestimosUsuario(id);
         } catch (SQLException e){

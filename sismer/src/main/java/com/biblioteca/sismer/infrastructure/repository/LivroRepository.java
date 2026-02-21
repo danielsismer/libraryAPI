@@ -8,11 +8,12 @@ import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class LivroRepository {
 
-    public Livro cadastrarLivro(Livro livro) {
+    public Optional<Livro> cadastrarLivro(Livro livro) {
 
         String query = """
                 INSERT INTO livro(
@@ -33,7 +34,7 @@ public class LivroRepository {
 
             if(rs.next()){
                 livro.setId(rs.getLong(1));
-                return livro;
+                return Optional.of(livro);
             }
 
         } catch (SQLException e) {
@@ -65,7 +66,7 @@ public class LivroRepository {
         }
     }
 
-    public Livro buscarPorID(Long id) {
+    public Optional<Livro> buscarPorID(Long id) {
 
         String query = """
                 SELECT id,
@@ -83,7 +84,9 @@ public class LivroRepository {
             ResultSet rs = stmt.executeQuery();
 
             if(rs.next()){
-                return new Livro(rs.getLong("id"), rs.getString("titulo"), rs.getString("autor"), rs.getInt("ano_publicacao"));
+                Livro livro = new Livro(rs.getLong("id"), rs.getString("titulo"), rs.getString("autor"), rs.getInt("ano_publicacao"));
+                return Optional.of(livro);
+
             }
 
         } catch (SQLException e) {
@@ -114,7 +117,7 @@ public class LivroRepository {
         return false;
     }
 
-    public Livro atualizar(Long id, Livro livro) throws SQLException {
+    public Optional<Livro> atualizar(Long id, Livro livro) throws SQLException {
         String query = """
                 UPDATE livro SET titulo = ?, autor = ?, ano_publicacao = ?
                 WHERE id = ?
@@ -129,7 +132,9 @@ public class LivroRepository {
             stmt.setLong(4, id);
             stmt.executeUpdate();
 
-            return new Livro(id, livro.getTitulo(), livro.getAutor(), livro.getAno());
+             livro = new Livro(id, livro.getTitulo(), livro.getAutor(), livro.getAno());
+
+             return Optional.of(livro);
         }
     }
 

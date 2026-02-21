@@ -11,6 +11,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class EmprestimoRepository {
@@ -18,7 +19,7 @@ public class EmprestimoRepository {
     private UsuarioRepository usuarioRepository;
     private LivroRepository livroRepository;
 
-    public Emprestimo registrarEmprestimo(Emprestimo emprestimo) throws SQLException {
+    public Optional<Emprestimo> registrarEmprestimo(Emprestimo emprestimo) throws SQLException {
         String query = """
                 INSERT INTO emprestimo (livro_id, usuario_id, data_emprestimo)
                 VALUES (?, ?, ?)
@@ -35,7 +36,7 @@ public class EmprestimoRepository {
 
             if(rs.next()){
                 emprestimo.setId(rs.getLong(1));
-                return emprestimo;
+                return Optional.of(emprestimo);
             }
         }
 
@@ -65,7 +66,7 @@ public class EmprestimoRepository {
         return emprestimos;
     }
 
-    public Emprestimo buscarPorID(Long id) throws SQLException {
+    public Optional<Emprestimo> buscarPorID(Long id) throws SQLException {
         String query = """
                 SELECT id, livro_id, usuario_id, data_emprestimo, data_devolucao
                 FROM emprestimo WHERE id = ?
@@ -80,7 +81,8 @@ public class EmprestimoRepository {
             if(rs.next()){
                 Livro livro = new Livro(rs.getLong("livro_id"));
                 Usuario usuario = new Usuario(rs.getLong("usuario_id"));
-                return new Emprestimo(rs.getLong("id"), livro, usuario, rs.getDate("data_emprestimo"), rs.getDate("data_devolucao"));
+                Emprestimo emprestimo = new Emprestimo(rs.getLong("id"), livro, usuario, rs.getDate("data_emprestimo"), rs.getDate("data_devolucao"));
+                return Optional.of(emprestimo);
             }
         }
         return null;
@@ -107,7 +109,7 @@ public class EmprestimoRepository {
         return false;
     }
 
-    public Emprestimo atualizar(Long id, Emprestimo emprestimo) throws SQLException {
+    public Optional<Emprestimo> atualizar(Long id, Emprestimo emprestimo) throws SQLException {
 
         String query = """
                 UPDATE emprestimo
@@ -129,8 +131,9 @@ public class EmprestimoRepository {
             Livro livro = new Livro(emprestimo.getLivro().getId());
             Usuario usuario = new Usuario(emprestimo.getUsuario().getId());
 
-            return new Emprestimo(id, livro, usuario, emprestimo.getDataEmprestimo());
+            emprestimo = new Emprestimo(id, livro, usuario, emprestimo.getDataEmprestimo(), null);
 
+            return Optional.of(emprestimo);
         }
     }
 
@@ -147,7 +150,7 @@ public class EmprestimoRepository {
         }
     }
 
-    public void registrarDevolucao(Long id, DevolucaoDTO dto) throws SQLException {
+    public Optional<Emprestimo> registrarDevolucao(Long id, DevolucaoDTO dto) throws SQLException {
 
         String query = """
                 UPDATE emprestimo
@@ -160,6 +163,9 @@ public class EmprestimoRepository {
             stmt.setDate(1, dto.getDataDevolucao());
             stmt.setLong(2, id);
             stmt.executeUpdate();
+
+            return Optional.of(new Emprestimo(id, dto.getDataDevolucao()));
+
         }
 
     }

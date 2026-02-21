@@ -1,112 +1,93 @@
 package com.biblioteca.sismer.service;
 
 import com.biblioteca.sismer.dto.DevolucaoDTO;
+import com.biblioteca.sismer.dto.request.EmprestimoRequestDTO;
+import com.biblioteca.sismer.dto.response.EmprestimoResponseDTO;
 import com.biblioteca.sismer.infrastructure.repository.EmprestimoRepository;
+import com.biblioteca.sismer.mapper.EmprestimoMapper;
 import com.biblioteca.sismer.model.Emprestimo;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
+
 import java.sql.SQLException;
-import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EmprestimoService {
 
     private final EmprestimoRepository emprestimoRepository;
-    private final UsuarioService usuarioService;
-    private final LivroService livroService;
+    private final EmprestimoMapper emprestimoMapper;
 
-    public EmprestimoService (EmprestimoRepository emprestimoRepository, UsuarioService usuarioService, LivroService livroService){
+    public EmprestimoService (EmprestimoRepository emprestimoRepository, UsuarioService usuarioService, LivroService livroService, EmprestimoMapper emprestimoMapper){
         this.emprestimoRepository = emprestimoRepository;
-        this.usuarioService = usuarioService;
-        this.livroService = livroService;
+        this.emprestimoMapper = emprestimoMapper;
     }
 
-    public Emprestimo registrarEmprestimo(Emprestimo emprestimo) throws SQLException {
+    public EmprestimoResponseDTO registrarEmprestimo(EmprestimoRequestDTO emprestimoRequest) throws SQLException {
 
-        if (emprestimoRepository.aceitarEmprestimo(emprestimo)){
-            throw new RuntimeException("Não foi possível emprestar esse livro. Este livro já está em um emprestimo!!!");
-        }
+        Emprestimo emprestimo = emprestimoMapper.toEntity(emprestimoRequest);
 
-        emprestimo = emprestimoRepository.registrarEmprestimo(emprestimo);
+        return emprestimoRepository.registrarEmprestimo(emprestimo)
+                .map(emprestimoMapper::toResponse)
+                .orElseThrow(() -> new RuntimeException("Erro ao salvar no Banco"));
 
-        emprestimo.setUsuario(usuarioService.buscarPorID(emprestimo.getUsuario().getId()));
-        emprestimo.setLivro(livroService.buscarPorID(emprestimo.getLivro().getId()));
-        return emprestimo;
     }
 
-    public List<Emprestimo> listarTodos() throws SQLException {
-
-        List<Emprestimo> emprestimos = emprestimoRepository.listarTodos();
-
-        for(Emprestimo emprestimo: emprestimos){
-            emprestimo.setUsuario(usuarioService.buscarPorID(emprestimo.getUsuario().getId()));
-            emprestimo.setLivro(livroService.buscarPorID(emprestimo.getLivro().getId()));
-        }
-
-        return emprestimos;
+    public List<EmprestimoResponseDTO> listarTodos() throws SQLException {
+        return emprestimoRepository.listarTodos()
+                .stream()
+                .map(emprestimoMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public Emprestimo buscarPorID(Long id) throws SQLException {
+    public EmprestimoResponseDTO buscarPorID(Long id) throws SQLException {
 
-        Emprestimo emprestimo = emprestimoRepository.buscarPorID(id);
+        return emprestimoRepository.buscarPorID(id)
+                .map(emprestimoMapper::toResponse)
+                .orElseThrow(() -> new RuntimeException(""));
 
-        if(emprestimo == null){
-            throw new RuntimeException();
-        }
-
-        emprestimo.setLivro(livroService.buscarPorID(emprestimo.getLivro().getId()));
-        emprestimo.setUsuario(usuarioService.buscarPorID(emprestimo.getUsuario().getId()));
-
-        return emprestimo;
     }
 
-    public Emprestimo atualizar(Long id, Emprestimo emprestimo) throws SQLException {
+    public EmprestimoResponseDTO atualizar(Long id, EmprestimoRequestDTO emprestimoRequest) throws SQLException {
 
-        Emprestimo emprestimoExistente = emprestimoRepository.buscarPorID(id);
+        Emprestimo emprestimo = emprestimoMapper.toEntity(emprestimoRequest);
 
-        if (emprestimoExistente == null ){
-            throw new RuntimeException();
-        }
-
-        emprestimo = emprestimoRepository.atualizar(id, emprestimo);
-        emprestimo.setLivro(livroService.buscarPorID(emprestimo.getLivro().getId()));
-        emprestimo.setUsuario(usuarioService.buscarPorID(emprestimo.getUsuario().getId()));
-
-        return emprestimo;
+        return emprestimoRepository.atualizar(id, emprestimo)
+                .map(emprestimoMapper::toResponse)
+                .orElseThrow(() -> new RuntimeException("Erro ao buscar ID " + id));
     }
 
     public void deletar(Long id) throws SQLException {
-        Emprestimo emprestimoExistente = emprestimoRepository.buscarPorID(id);
+       Optional<Emprestimo> emprestimoExistente = emprestimoRepository.buscarPorID(id);
 
-        if (emprestimoExistente == null ){
-            throw new RuntimeException();
+        if (emprestimoExistente.isEmpty()){
+            throw new RuntimeException("ID inexistente");
         }
 
         emprestimoRepository.deletar(id);
     }
 
-    public Emprestimo registrarDevolucao(Long id, DevolucaoDTO dto) throws SQLException {
+    public EmprestimoResponseDTO registrarDevolucao(Long id, DevolucaoDTO dto) throws SQLException {
 
-        Emprestimo emprestimoExistente = emprestimoRepository.buscarPorID(id);
+        Optional<Emprestimo> emprestimoExistente = emprestimoRepository.buscarPorID(id);
 
-        if (emprestimoExistente == null ){
+        if (emprestimoExistente.isEmpty()){
             throw new RuntimeException();
         }
 
-        emprestimoRepository.registrarDevolucao(id, dto);
-
-        emprestimoExistente.setLivro(livroService.buscarPorID(emprestimoExistente.getLivro().getId()));
-        emprestimoExistente.setUsuario(usuarioService.buscarPorID(emprestimoExistente.getUsuario().getId()));
-        emprestimoExistente.setDataDevolucao(dto.getDataDevolucao());
-
-        return emprestimoExistente;
+        return emprestimoRepository.registrarDevolucao(id, dto)
+                .map(emprestimoMapper::toResponse)
+                .orElseThrow(() -> new RuntimeException(""));
     }
 
-    public List<Emprestimo> emprestimosUsuario(Long id) throws SQLException {
+    public List<EmprestimoResponseDTO> emprestimosUsuario(Long id) throws SQLException {
         try{
-            return emprestimoRepository.emprestimosUsuario(id);
+            return emprestimoRepository.emprestimosUsuario(id)
+                    .stream().map(emprestimoMapper::toResponse)
+                    .collect(Collectors.toList());
         } catch (SQLException e){
             e.printStackTrace();
             throw new RuntimeException(e.getMessage());

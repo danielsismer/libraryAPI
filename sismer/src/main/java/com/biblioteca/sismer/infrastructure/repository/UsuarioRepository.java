@@ -9,6 +9,7 @@ import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class UsuarioRepository {
@@ -63,7 +64,7 @@ public class UsuarioRepository {
         return usuarios;
     }
 
-    public Usuario buscarPorID(Long id) {
+    public Optional<Usuario> buscarPorID(Long id) {
         String query = """
                 SELECT id,
                 nome,
@@ -79,7 +80,8 @@ public class UsuarioRepository {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()){
-                return new Usuario(rs.getLong("id"), rs.getString("nome"), rs.getString("email"));
+                Usuario usuario = new Usuario(rs.getLong("id"), rs.getString("nome"), rs.getString("email"));
+                return Optional.of(usuario);
             }
 
         } catch (SQLException e) {
@@ -112,7 +114,7 @@ public class UsuarioRepository {
         return false;
     }
 
-    public Usuario atualizar(Long id, Usuario usuario) throws SQLException {
+    public Optional<Usuario> atualizar(Long id, Usuario usuario) throws SQLException {
         String query = """
                 UPDATE usuario SET nome = ?, email = ? WHERE id = ?
                 """;
@@ -124,7 +126,7 @@ public class UsuarioRepository {
             stmt.setLong(3, id);
             stmt.executeUpdate();
             usuario.setId(id);
-            return usuario;
+            return Optional.of(usuario);
         }
 
     }

@@ -1,5 +1,7 @@
 package com.biblioteca.sismer.controller;
 
+import com.biblioteca.sismer.dto.request.UsuarioResquestDTO;
+import com.biblioteca.sismer.dto.response.UsuarioResponseDTO;
 import com.biblioteca.sismer.model.Livro;
 import com.biblioteca.sismer.model.Usuario;
 import com.biblioteca.sismer.service.UsuarioService;
@@ -19,7 +21,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public Usuario cadastrarUsuario(@RequestBody Usuario usuario){
+    public UsuarioResponseDTO cadastrarUsuario(@RequestBody UsuarioResquestDTO usuario){
 
         try{
             return usuarioService.cadastrarUsuario(usuario);
@@ -29,7 +31,7 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public List<Usuario> listarTodos(){
+    public List<UsuarioResponseDTO> listarTodos(){
         try{
             return usuarioService.listarTodos();
         } catch (SQLException e){
@@ -38,7 +40,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public Usuario buscarPorID(@PathVariable Long id){
+    public UsuarioResponseDTO buscarPorID(@PathVariable Long id){
 
         try{
             return usuarioService.buscarPorID(id);
@@ -48,7 +50,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public Usuario atualizar(@RequestBody Usuario usuario, @PathVariable Long id){
+    public UsuarioResponseDTO atualizar(@RequestBody UsuarioResquestDTO usuario, @PathVariable Long id){
 
         try{
             return usuarioService.atualizar(id, usuario);

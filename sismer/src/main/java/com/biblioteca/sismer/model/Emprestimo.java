@@ -10,7 +10,6 @@ public class Emprestimo {
     private Livro livro;
     private Usuario usuario;
     private Date dataEmprestimo;
-
     private Date dataDevolucao;
 
     public Emprestimo() {}
@@ -23,14 +22,12 @@ public class Emprestimo {
         this.dataDevolucao = dataDevolucao;
     }
 
-    public Emprestimo(Long id, Livro livro, Usuario usuario, Date dataEmprestimo) {
-        this.id = id;
-        this.livro = null;
-        this.usuario = null;
+    public Emprestimo(Livro livro, Usuario usuario, Date dataEmprestimo, Date dataDevolucao) {
+        this.livro = livro;
+        this.usuario = usuario;
         this.dataEmprestimo = dataEmprestimo;
+        this.dataDevolucao = null;
     }
-
-
 
     public Emprestimo(Long id, Date dataDevolucao) {
         this.id = id;
